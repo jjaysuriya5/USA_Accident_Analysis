@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	{% block title %}Home Page{% endblock %}
+
+	
+</head>
+<body>
+
+	<div class="sidenav">
+	</div>
+	<div id="content" name="content" class = "main">
+		{% block content %}
+		<h3>WELCOME TO USA ACCIDENTS PREDICTION SYSTEM</h3>
+		<br>
+		<br>
+		<h4> User Menu Options</h4>
+		<ol>
+  			<li>USA Map  -  Contains the Accident happening in USA ( state wise )</li>
+  			<li>Accidents - Contains over all accident count</li>
+  			<li>Prediction - To predict accident severity</li>
+			<li>Forecasting - To Forecast future accidents</li>
+		</ol>
+		<br>
+		<br>
+		
+		<div class="card mb-3" style="max-width: 650px;">
+	      <div class="row no-gutters">
+	        <div class="col-md-4">
+	          <img src="/static/jj.jpg" class="card-img" alt="...">
+	        </div>
+	        <div class="col-md-8">
+	          <div class="card-body">
+	            <h5 class="card-title">Jaya Suriya J</h5>
+	            <p class="card-text">Aspiring Data Scientist with ML and DL skills</p>
+	            <p>Feel free to contact for any suggestions</p>
+	            <a href="https://www.linkedin.com/in/jaya-suriya-jeya-sankar-ab80a2192/" class="btn btn-primary" target="_blank">Linkedin</a>
+	          </div>
+	        </div>
+	      </div>
+	    </div>
+
+		{% endblock %}
+	</div>
+</body>
