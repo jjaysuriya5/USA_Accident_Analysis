@@ -122,6 +122,8 @@ def forecast():
             return render_template( 'AccidentForecasting_DL.html' , date = date[0:n])
 
 if __name__ == '__main__':
+ 
+
      class FeatureSelector( BaseEstimator, TransformerMixin ):
 
           def __init__( self, feature_names ):
@@ -132,8 +134,7 @@ if __name__ == '__main__':
 
           def transform( self, X, y = None ):
               return X[ self._feature_names ]
-     
-     
+ 
      class Encoding(BaseEstimator, TransformerMixin):     
          def __init__(self , categorical_columns ):
              import pandas as pd
@@ -183,4 +184,4 @@ if __name__ == '__main__':
 
              return self 
        
-    app.run(debug = True)
+     app.run(debug = True)    
