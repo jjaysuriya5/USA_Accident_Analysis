@@ -54,6 +54,8 @@ def predict_severity():
 
 @app.route('/predict_severity' , methods = ['GET','POST'])
 def predict():
+    global pipe
+    global model
     if request.method == 'POST':
         user_input =  request.form 
         
