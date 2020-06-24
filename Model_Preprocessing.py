@@ -1,8 +1,16 @@
 from sklearn.base import BaseEstimator, TransformerMixin 
 import pandas as pd
 import joblib
-#Custom Transformer that extracts columns passed as argument to its constructor x`
+import dill as pickle
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.pipeline import Pipeline
+from sklearn.impute import KNNImputer
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.pipeline import FeatureUnion
+from sklearn.model_selection import train_test_split
 
+#Custom Transformer that extracts columns passed as argument to its constructor x`
 class FeatureSelector( BaseEstimator, TransformerMixin ):
 
     def __init__( self, feature_names ):
@@ -14,6 +22,7 @@ class FeatureSelector( BaseEstimator, TransformerMixin ):
     def transform( self, X, y = None ):
         return X[ self._feature_names ]
     
+#Custom Transformer that encodes categorical variables    
 class Encoding(BaseEstimator, TransformerMixin):
     def __init__(self , categorical_columns ):
         import pandas as pd
@@ -64,11 +73,87 @@ class Encoding(BaseEstimator, TransformerMixin):
         return self
     
 
-def pipe():
-    pipe = joblib.load('pipe.joblib')
-    return pipe
+def train_pipe():
+    
+    data = pd.read_excel( 'C:\\Users\\Administrator\\Desktop\\proj\\US Car Acciedent\\Python File\\usa_1.xlsx')
+    
+    data['Year']=data['Start_Time'].dt.year
+    data['Month']=data['Start_Time'].dt.strftime('%b')
+    data['Day']=data['Start_Time'].dt.day
+    data['Hour']=data['Start_Time'].dt.hour
+    data['Weekday']=data['Start_Time'].dt.strftime('%a')
+
+    for col in ['TMC','Year','Day','Hour']:
+        data[col] = data[col].astype('int16')
+        
+    for col in ["Severity", "Side", "City", "State", "County", "Timezone", "Airport_Code",
+            "Wind_Direction", "Weather_Condition", "Sunrise_Sunset", "Civil_Twilight", "Nautical_Twilight",
+            "Astronomical_Twilight",'part_of_day','Month','Weekday','Year'] :
+            
+            data[col] = data[col].astype('category')
+            
+    data['Weekday'] = data['Start_Time'].dt.strftime('%a').apply( lambda x : 1 if x == 'Mon' else 2 if x == 'Tue'
+                                          else 3 if x == 'Wed' else 4 if x == 'Thu' else 5 if x == 'Fri'
+                                          else 6 if x == 'Sat' else 7).astype('int16')
+    data['Month'] = data['Start_Time'].dt.month
+    data['Year'] = data['Year'].astype('int16')
+    
+    
+    numeric_columns = ['TMC', 'Start_Lat', 'Start_Lng', 'Distance(mi)', 'Temperature(F)',
+                       'Humidity(%)', 'Pressure(in)', 'Visibility(mi)', 'Wind_Speed(mph)',
+                       'Precipitation(in)', 'Year', 'Month', 'Day', 'Hour', 'Weekday']
+
+    categorical_columns = ['Airport_Code', 'Amenity', 'Bump', 'City', 'County', 'Crossing',
+                           'Give_Way', 'Junction', 'Railway', 'Roundabout', 'Severity' , 'Side', 'State',
+                           'Station', 'Stop', 'Street', 'Timezone', 'Traffic_Signal',
+                           'Turning_Loop', 'Weather_Condition', 'Wind_Direction', 'part_of_day']
+
+    # pipeline for categorical data
+    
+    imp = SimpleImputer(strategy="most_frequent")
+    ms_c = MinMaxScaler()
+    
+    categorical_pipeline = Pipeline( [ ('Categorical Features' , FeatureSelector(categorical_columns) ) , 
+                                   ('Missing Value Treatement' , imp ) ,
+                                   ('Categorical Encoding' , Encoding( categorical_columns ) ),
+                                   ('Scaling Features' , ms_c )
+                                 ]
+                               ) 
+    
+    # pipeline for Numerical data
+    
+    imputer = KNNImputer(n_neighbors=2, weights="uniform")
+    ms = MinMaxScaler()
+    
+    numerical_pipeline = Pipeline( [ ('Numerical Features' , FeatureSelector(numeric_columns) ) , 
+                                 ( 'Missing Value Treatement' , imputer ) ,
+                                 ( 'Scaling Features' , ms)
+                                 ]
+                               ) 
+    
+    # Combining two pipeline 
+    
+    preprocessing_pipeline = FeatureUnion( transformer_list = [ ( 'categorical_pipeline', categorical_pipeline ) ,
+                                                            ( 'numerical_pipeline', numerical_pipeline )
+                                                          ]
+                                     )
+            
+    
+    x = data.copy()
+    y = data['Severity'].copy()
+    
+    test_size = 0.2
+    x_train , x_test , y_train , y_test = train_test_split( x , y , test_size = test_size , random_state = 0 , stratify = y )
+    
+    preprocessing_pipeline.fit(x_train)
+    
+    return preprocessing_pipeline
+            
 
 if __name__ == '__main__':
-    FeatureSelector.__module__ = "__main__"
-    Encoding.__module__ = "__main__"
-    pipe()
+    
+    pipe = train_pipe()
+    
+    filename = 'dataProcessing_pipe.pk'
+    with open(filename, 'wb') as file:
+        pickle.dump(pipe, file)
