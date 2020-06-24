@@ -28,7 +28,11 @@ app = Flask(__name__)
 
 #Custom Transformer that extracts columns passed as argument to its constructor x`
 
-   
+@app.before_first_request
+def nbsvm_models():
+
+    global pipe 
+    global model   
      
 @app.route('/')
 def home_page():
@@ -188,9 +192,7 @@ if __name__ == '__main__':
 #     f.__module__ = "FeatureSelector"
 #     e = Encoding()
 #     e.__module__ ='Encoding'
-    global pipe 
     pipe = joblib.load('pipe.joblib')
-    global model
     model = joblib.load( 'model.joblib' )
     app.run(debug = True)
 #     from werkzeug.serving import run_simple
