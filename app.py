@@ -125,7 +125,7 @@ def forecast():
 if __name__ == '__main__':
     
     class FeatureSelector( BaseEstimator, TransformerMixin ):
-        def __init__( self, feature_names ):
+        def __init__( self, feature_names = None):
               self._feature_names = feature_names 
 
         def fit( self, X, y = None ):
@@ -135,7 +135,7 @@ if __name__ == '__main__':
               return X[ self._feature_names ]
     
     class Encoding(BaseEstimator, TransformerMixin):     
-        def __init__(self , categorical_columns ):
+        def __init__(self , categorical_columns = None ):
             import pandas as pd
             self.col = categorical_columns
 
@@ -182,7 +182,10 @@ if __name__ == '__main__':
             self.Weather_Condition_mapping = data.groupby('Weather_Condition')['Severity'].count().to_dict()
 
             return self 
-       
+    f = FeatureSelector()
+    f.__module__ = "FeatureSelector"
+    e = Encoding()
+    e.__module__ ='Encoding'       
     app.run(debug = True)    
 #     from werkzeug.serving import run_simple
 #     run_simple( 'localhost' , 5000 , app)
