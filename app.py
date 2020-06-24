@@ -15,7 +15,7 @@ TMC = [241, 201, 245, 247, 206, 203, 343, 202, 229, 222, 246, 406, 248, 236, 239
 
 from flask import Flask , render_template , url_for , request
 from sklearn.base import BaseEstimator, TransformerMixin 
-from keras.models import model_from_json 
+# from keras.models import model_from_json 
 import warnings
 warnings.filterwarnings('ignore')
 import joblib
@@ -80,24 +80,24 @@ def predict():
         user_data.append( row )
 
         data = pd.DataFrame( user_data , columns = columns)
-        pipe = joblib.load('pipe.joblib')
+        
         data = pipe.transform( data )
 
         pt = int( request.form['PredictType'] )
         
         if pt == 1 :
-            model = joblib.load( 'model.joblib' )
+            
             severity_prediction = model.predict( data )[0]
         else :
-#             pass
-            json_file = open( 'model1.json' , 'r')
-            loaded_model_json = json_file.read()
-            json_file.close()
+            pass
+#             json_file = open( 'model1.json' , 'r')
+#             loaded_model_json = json_file.read()
+#             json_file.close()
 
-            loaded_model = model_from_json( loaded_model_json)
-            loaded_model.load_weights('model1.h5')
+#             loaded_model = model_from_json( loaded_model_json)
+#             loaded_model.load_weights('model1.h5')
             
-            severity_prediction = loaded_model.predict_classes( data )[0]
+#             severity_prediction = loaded_model.predict_classes( data )[0]
         
         display_info = []
         for i in [ 'Start_Lat', 'Start_Lng' , 'Street', 'City', 'County' , 'State' , 'Year', 'Month', 'Day', 'Hour' ]:
@@ -125,7 +125,7 @@ def forecast():
 if __name__ == '__main__':
     
     class FeatureSelector( BaseEstimator, TransformerMixin ):
-        def __init__( self, feature_names = None):
+        def __init__( self, feature_names):
               self._feature_names = feature_names 
 
         def fit( self, X, y = None ):
@@ -135,7 +135,7 @@ if __name__ == '__main__':
               return X[ self._feature_names ]
     
     class Encoding(BaseEstimator, TransformerMixin):     
-        def __init__(self , categorical_columns = None ):
+        def __init__(self , categorical_columns):
             import pandas as pd
             self.col = categorical_columns
 
@@ -182,10 +182,16 @@ if __name__ == '__main__':
             self.Weather_Condition_mapping = data.groupby('Weather_Condition')['Severity'].count().to_dict()
 
             return self 
-    f = FeatureSelector()
-    f.__module__ = "FeatureSelector"
-    e = Encoding()
-    e.__module__ ='Encoding'       
-    app.run(debug = True)    
+       
+#     app.run(debug = True)
+#     f = FeatureSelector()
+#     f.__module__ = "FeatureSelector"
+#     e = Encoding()
+#     e.__module__ ='Encoding'
+    global pipe 
+    pipe = joblib.load('pipe.joblib')
+    global model
+    model = joblib.load( 'model.joblib' )
+    app.run(debug = True)
 #     from werkzeug.serving import run_simple
 #     run_simple( 'localhost' , 5000 , app)
