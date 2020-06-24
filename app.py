@@ -15,11 +15,12 @@ TMC = [241, 201, 245, 247, 206, 203, 343, 202, 229, 222, 246, 406, 248, 236, 239
 
 from flask import Flask , render_template , url_for , request
 from sklearn.base import BaseEstimator, TransformerMixin 
-from Model_Preprocessing import pipe
+# from ipynb.fs.full.Model_Preprocessing import pipe
 # from keras.models import model_from_json 
 import warnings
 warnings.filterwarnings('ignore')
 import joblib
+import dill as pickle
 import pandas as pd
 import numpy as np
 
@@ -86,9 +87,11 @@ def predict():
 
         data = pd.DataFrame( user_data , columns = columns)
         
-        p = pipe()
+        loaded_pipe = None
+        with open('dataProcessing_pipe.pk','rb') as f:
+            loaded_pipe = pickle.load(f)
         
-        data = p.transform( data )
+        data = loaded_pipe.transform( data )
 
         pt = int( request.form['PredictType'] )
         
@@ -130,8 +133,9 @@ def forecast():
             return render_template( 'AccidentForecasting_DL.html' , date = date[0:n])
 
 if __name__ == '__main__':
-    from Model_Preprocessing import pipe  ,  FeatureSelector  , Encoding
-    FeatureSelector.__module__ = "__main__"
-    Encoding.__module__ = "__main__"
-    from werkzeug.serving import run_simple
-    run_simple( 'localhost' , 5000 , app)
+ 
+#     from werkzeug.serving import run_simple
+#     run_simple( 'localhost' , 5000 , app)
+    app.run( debug = True )
+   
+   
