@@ -56,6 +56,8 @@ def predict_severity():
 def predict():
     global pipe
     global model
+    pipe = joblib.load('pipe.joblib')
+    model = joblib.load( 'model.joblib' )   
     if request.method == 'POST':
         user_input =  request.form 
         
