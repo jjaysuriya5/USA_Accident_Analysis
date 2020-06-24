@@ -87,6 +87,8 @@ def predict():
 
         data = pd.DataFrame( user_data , columns = columns)
         
+        pickle._dill._reverse_typemap['ClassType'] = type
+        
         loaded_pipe = None
         with open('dataProcessing_pipe.pk','rb') as f:
             loaded_pipe = pickle.load(f)
