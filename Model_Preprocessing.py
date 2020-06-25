@@ -22,7 +22,8 @@ class FeatureSelector( BaseEstimator,TransformerMixin ):
     def transform( self, X, y = None ):
         return X[ self._feature_names ]
     
-#Custom Transformer that encodes categorical variables    
+#Custom Transformer that encodes categorical variables   
+
 class Encoding( BaseEstimator,TransformerMixin):
     def __init__(self , categorical_columns = None ):
         import pandas as pd
@@ -56,7 +57,6 @@ class Encoding( BaseEstimator,TransformerMixin):
             return self.data
     
     def fit(self, data, y=None, **fit_params):
-        import pandas as pd
         
         import pandas as pd
         data = pd.DataFrame( data , columns = self.col )
@@ -153,33 +153,11 @@ class PreProcessing:
         x_train , x_test , y_train , y_test = train_test_split( x , y , test_size = test_size , random_state = 0 , stratify = y )
 
         preprocessing_pipeline.fit(x_train)
-
-        self.preprocessing_pipeline = preprocessing_pipeline
-        
-        
-    def save_pipe(self):
         
         filename = 'pipe.pickle'
         with open(filename, 'wb') as file:
-            pickle.dump(self.preprocessing_pipeline, file)
-        
-    def load_pipe(self):
-        
-        class CustomUnpickler(pickle.Unpickler):
-            
-            def find_class(self, module, name):
-                if name == 'FeatureSelector':
-                    from ipynb.fs.full.Model_Preprocessing import FeatureSelector
-                    return FeatureSelector
-                elif name == 'Encoding':
-                    from ipynb.fs.full.Model_Preprocessing import Encoding
-                    return Encoding
-                return super().find_class(module, name)
-    
-        
-        filename = 'pipe.pickle'
-        self.loaded_pipe = CustomUnpickler( open(filename, 'rb') ).load()       
-        return self.loaded_pipe
+            pickle.dump(preprocessing_pipeline, file)
+
         
 
 if __name__ == '__main__':
@@ -187,6 +165,6 @@ if __name__ == '__main__':
     p = PreProcessing()
     
     p.train_pipe()
-    p.save_pipe()
+
     
     
