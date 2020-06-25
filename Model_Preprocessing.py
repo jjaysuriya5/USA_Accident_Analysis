@@ -169,6 +169,8 @@ class PreProcessing:
 
 if __name__ == '__main__':
     
+    from Model_Preprocessing import FeatureSelector , Encoding , PreProcessing
+    
     f = FeatureSelector()
     f.__module__  = 'Model_Preprocessing'
     
