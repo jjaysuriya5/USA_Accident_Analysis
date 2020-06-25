@@ -1,4 +1,4 @@
-from sklearn.base import  TransformerMixin 
+from sklearn.base import BaseEstimator, TransformerMixin 
 import pandas as pd
 import joblib
 import pickle
@@ -11,19 +11,19 @@ from sklearn.pipeline import FeatureUnion
 from sklearn.model_selection import train_test_split
 
 #Custom Transformer that extracts columns passed as argument to its constructor x`
-class FeatureSelector(  TransformerMixin ):
+class FeatureSelector( BaseEstimator,TransformerMixin ):
 
-    def __init__( self, feature_names = None ):
+    def __init__( self, feature_names = None  ):
         self._feature_names = feature_names 
      
-    def fit( self, X, y = None ):
+    def fit( self, X, y = None , **fit_params ):
         return self 
 
     def transform( self, X, y = None ):
         return X[ self._feature_names ]
     
 #Custom Transformer that encodes categorical variables    
-class Encoding( TransformerMixin):
+class Encoding( BaseEstimator,TransformerMixin):
     def __init__(self , categorical_columns = None ):
         import pandas as pd
         self.col = categorical_columns
@@ -78,10 +78,10 @@ class PreProcessing:
         pass
     
     def train_pipe(self):
-        
+
         f = FeatureSelector()
         e = Encoding()
-        
+
         data = pd.read_excel( 'C:\\Users\\Administrator\\Desktop\\proj\\US Car Acciedent\\Python File\\usa_1.xlsx')
 
         data['Year']=data['Start_Time'].dt.year
@@ -159,7 +159,7 @@ class PreProcessing:
         
     def save_pipe(self):
         
-        self.filename = 'pipe.pickle'
+        filename = 'pipe.pickle'
         with open(filename, 'wb') as file:
             pickle.dump(self.preprocessing_pipeline, file)
         
@@ -169,10 +169,10 @@ class PreProcessing:
             
             def find_class(self, module, name):
                 if name == 'FeatureSelector':
-                    from Model_Preprocessing import FeatureSelector
+                    from ipynb.fs.full.Model_Preprocessing import FeatureSelector
                     return FeatureSelector
                 elif name == 'Encoding':
-                    from Model_Preprocessing import Encoding
+                    from ipynb.fs.full.Model_Preprocessing import Encoding
                     return Encoding
                 return super().find_class(module, name)
     
@@ -183,8 +183,9 @@ class PreProcessing:
         
 
 if __name__ == '__main__':
-       
+
     p = PreProcessing()
+    
     p.train_pipe()
     p.save_pipe()
     
