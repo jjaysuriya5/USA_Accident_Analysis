@@ -152,7 +152,7 @@ class PreProcessing:
         test_size = 0.2
         x_train , x_test , y_train , y_test = train_test_split( x , y , test_size = test_size , random_state = 0 , stratify = y )
 
-        u_d = preprocessing_pipeline.fit_transform(x_train)
+        u_d = preprocessing_pipeline.fit(x_train)
 
         self.preprocessing_pipeline = preprocessing_pipeline
         
@@ -184,7 +184,7 @@ class PreProcessing:
 
 if __name__ == '__main__':
        
-    
+    p = PreProcessing()
     p.train_pipe()
     p.save_pipe()
     
