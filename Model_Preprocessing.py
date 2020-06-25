@@ -9,6 +9,7 @@ from sklearn.impute import KNNImputer
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import FeatureUnion
 from sklearn.model_selection import train_test_split
+from sklearn.utils import check_array
 
 #Custom Transformer that extracts columns passed as argument to its constructor x`
 class FeatureSelector( BaseEstimator,TransformerMixin ):
@@ -72,6 +73,14 @@ class Encoding( BaseEstimator,TransformerMixin):
         
         return self
     
+class CustomeScaler(MinMaxScaler):
+    def transform(self, X):
+#         X = check_array(X, copy=self.copy, dtype=FLOAT_DTYPES,
+#                         force_all_finite="allow-nan")
+        X *= self.scale_
+        X += self.min_
+        return X
+    
 class PreProcessing:
     
     def __init__(self):
@@ -118,7 +127,7 @@ class PreProcessing:
         # pipeline for categorical data
 
         imp = SimpleImputer(strategy="most_frequent")
-        ms_c = MinMaxScaler()
+        ms_c = CustomeScaler()
 
         categorical_pipeline = Pipeline( [ ('Categorical Features' , FeatureSelector(categorical_columns) ) , 
                                        ('Missing Value Treatement' , imp ) ,
@@ -130,7 +139,7 @@ class PreProcessing:
         # pipeline for Numerical data
 
         imputer = KNNImputer(n_neighbors=2, weights="uniform")
-        ms = MinMaxScaler()
+        ms = CustomeScaler()
 
         numerical_pipeline = Pipeline( [ ('Numerical Features' , FeatureSelector(numeric_columns) ) , 
                                      ( 'Missing Value Treatement' , imputer ) ,
