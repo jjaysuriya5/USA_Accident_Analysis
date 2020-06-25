@@ -1,4 +1,4 @@
-from sklearn.base import BaseEstimator, TransformerMixin 
+from sklearn.base import  TransformerMixin 
 import pandas as pd
 import joblib
 import pickle
@@ -11,7 +11,7 @@ from sklearn.pipeline import FeatureUnion
 from sklearn.model_selection import train_test_split
 
 #Custom Transformer that extracts columns passed as argument to its constructor x`
-class FeatureSelector( BaseEstimator, TransformerMixin ):
+class FeatureSelector(  TransformerMixin ):
 
     def __init__( self, feature_names = None ):
         self._feature_names = feature_names 
@@ -23,7 +23,7 @@ class FeatureSelector( BaseEstimator, TransformerMixin ):
         return X[ self._feature_names ]
     
 #Custom Transformer that encodes categorical variables    
-class Encoding(BaseEstimator, TransformerMixin):
+class Encoding( TransformerMixin):
     def __init__(self , categorical_columns = None ):
         import pandas as pd
         self.col = categorical_columns
