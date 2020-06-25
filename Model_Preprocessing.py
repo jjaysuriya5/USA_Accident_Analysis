@@ -165,24 +165,25 @@ class PreProcessing:
         
     def load_pipe(self):
         
+        class CustomUnpickler(pickle.Unpickler):
+            
+            def find_class(self, module, name):
+                if name == 'FeatureSelector':
+                    from ipynb.fs.full.Model_Preprocessing import FeatureSelector
+                    return FeatureSelector
+                elif name == 'Encoding':
+                    from ipynb.fs.full.Model_Preprocessing import Encoding
+                    return Encoding
+                return super().find_class(module, name)
+    
+        
         filename = 'pipe.pickle'
-        self.loaded_pipe = pickle.load( open(filename, 'rb') )       
+        self.loaded_pipe = CustomUnpickler( open(filename, 'rb') ).load()       
         return self.loaded_pipe
         
 
 if __name__ == '__main__':
-    
-    from Model_Preprocessing import FeatureSelector , Encoding , PreProcessing
-    
-    f = FeatureSelector()
-    f.__module__  = 'Model_Preprocessing'
-    
-    e = Encoding()
-    e.__module__  = 'Model_Preprocessing'
-    
-    p = PreProcessing()
-    p.__module__  = 'Model_Preprocessing'
-    
+       
     
     p.train_pipe()
     p.save_pipe()
