@@ -78,7 +78,10 @@ class PreProcessing:
         pass
     
     def train_pipe(self):
-
+        
+        f = FeatureSelector()
+        e = Encoding()
+        
         data = pd.read_excel( 'C:\\Users\\Administrator\\Desktop\\proj\\US Car Acciedent\\Python File\\usa_1.xlsx')
 
         data['Year']=data['Start_Time'].dt.year
