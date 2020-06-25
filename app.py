@@ -15,7 +15,7 @@ TMC = [241, 201, 245, 247, 206, 203, 343, 202, 229, 222, 246, 406, 248, 236, 239
 
 from flask import Flask , render_template , url_for , request
 from sklearn.base import  TransformerMixin 
-from ipynb.fs.full.Model_Preprocessing import  PreProcessing
+from Model_Preprocessing import  PreProcessing
 # from keras.models import model_from_json 
 import warnings
 warnings.filterwarnings('ignore')
@@ -24,6 +24,7 @@ import dill as pickle
 import pandas as pd
 import numpy as np
 import joblib
+from sklearn.utils import check_array
 
 date = ["2020-01-01T00:00:00", "2020-01-02T00:00:00", "2020-01-03T00:00:00", "2020-01-04T00:00:00", "2020-01-05T00:00:00", "2020-01-06T00:00:00", "2020-01-07T00:00:00", "2020-01-08T00:00:00", "2020-01-09T00:00:00", "2020-01-10T00:00:00", "2020-01-11T00:00:00", "2020-01-12T00:00:00", "2020-01-13T00:00:00", "2020-01-14T00:00:00", "2020-01-15T00:00:00", "2020-01-16T00:00:00", "2020-01-17T00:00:00", "2020-01-18T00:00:00", "2020-01-19T00:00:00", "2020-01-20T00:00:00", "2020-01-21T00:00:00", "2020-01-22T00:00:00", "2020-01-23T00:00:00", "2020-01-24T00:00:00", "2020-01-25T00:00:00", "2020-01-26T00:00:00", "2020-01-27T00:00:00", "2020-01-28T00:00:00"]
 
@@ -40,11 +41,14 @@ def nbsvm_models():
     class CustomUnpickler(pickle.Unpickler):
         def find_class(self, module, name):
             if name == 'FeatureSelector':
-                from ipynb.fs.full.Model_Preprocessing import FeatureSelector
+                from Model_Preprocessing import FeatureSelector
                 return FeatureSelector
             elif name == 'Encoding':
-                from ipynb.fs.full.Model_Preprocessing import Encoding
+                from Model_Preprocessing import Encoding
                 return Encoding
+            elif name == 'CustomeScaler':
+                from Model_Preprocessing import CustomeScaler
+                return CustomeScaler
             return super().find_class(module, name)
 
     filename = 'pipe.pickle'
@@ -147,6 +151,6 @@ def forecast():
 
 if __name__ == '__main__':
 
-    app.run(debug = True)
+#     app.run(debug = True)
 #     from werkzeug.serving import run_simple
 #     run_simple( 'localhost' , 5000 , app)
