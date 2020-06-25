@@ -15,14 +15,15 @@ TMC = [241, 201, 245, 247, 206, 203, 343, 202, 229, 222, 246, 406, 248, 236, 239
 
 from flask import Flask , render_template , url_for , request
 from sklearn.base import BaseEstimator, TransformerMixin 
-# from ipynb.fs.full.Model_Preprocessing import pipe
+from ipynb.fs.full.Model_Preprocessing import FeatureSelector , Encoding , PreProcessing
 # from keras.models import model_from_json 
 import warnings
 warnings.filterwarnings('ignore')
-import joblib
+import pickle
 import dill as pickle
 import pandas as pd
 import numpy as np
+import joblib
 
 date = ["2020-01-01T00:00:00", "2020-01-02T00:00:00", "2020-01-03T00:00:00", "2020-01-04T00:00:00", "2020-01-05T00:00:00", "2020-01-06T00:00:00", "2020-01-07T00:00:00", "2020-01-08T00:00:00", "2020-01-09T00:00:00", "2020-01-10T00:00:00", "2020-01-11T00:00:00", "2020-01-12T00:00:00", "2020-01-13T00:00:00", "2020-01-14T00:00:00", "2020-01-15T00:00:00", "2020-01-16T00:00:00", "2020-01-17T00:00:00", "2020-01-18T00:00:00", "2020-01-19T00:00:00", "2020-01-20T00:00:00", "2020-01-21T00:00:00", "2020-01-22T00:00:00", "2020-01-23T00:00:00", "2020-01-24T00:00:00", "2020-01-25T00:00:00", "2020-01-26T00:00:00", "2020-01-27T00:00:00", "2020-01-28T00:00:00"]
 
@@ -30,11 +31,16 @@ app = Flask(__name__)
 
 #Custom Transformer that extracts columns passed as argument to its constructor x`
 
-# @app.before_first_request
-# def nbsvm_models():
+@app.before_first_request
+def nbsvm_models():
 
-#     global pipe 
-#     global model
+    global pipe 
+    global model
+    
+    p = PreProcessing()
+    pipe = p.load_pipe()
+    
+    model = joblib.load( 'model.joblib' )
      
 @app.route('/')
 def home_page():
@@ -87,18 +93,12 @@ def predict():
 
         data = pd.DataFrame( user_data , columns = columns)
         
-        pickle._dill._reverse_typemap['ClassType'] = type
-        
-        loaded_pipe = None
-        with open('dataProcessing_pipe.pk','rb') as f:
-            loaded_pipe = pickle.load(f)
-        
-        data = loaded_pipe.transform( data )
+        data = pipe.transform( data )
 
         pt = int( request.form['PredictType'] )
         
         if pt == 1 :
-            model = joblib.load( 'model.joblib' )
+            
             severity_prediction = model.predict( data )[0]
         else :
             pass
@@ -135,9 +135,7 @@ def forecast():
             return render_template( 'AccidentForecasting_DL.html' , date = date[0:n])
 
 if __name__ == '__main__':
- 
+
+    app.run(debug = True)
 #     from werkzeug.serving import run_simple
 #     run_simple( 'localhost' , 5000 , app)
-    app.run( debug = True )
-   
-   
