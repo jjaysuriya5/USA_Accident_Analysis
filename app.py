@@ -15,12 +15,12 @@ TMC = [241, 201, 245, 247, 206, 203, 343, 202, 229, 222, 246, 406, 248, 236, 239
 
 from flask import Flask , render_template , url_for , request
 from sklearn.base import  TransformerMixin 
-from Model_Preprocessing import PreProcessing
+from ipynb.fs.full.Model_Preprocessing import  PreProcessing
 # from keras.models import model_from_json 
 import warnings
 warnings.filterwarnings('ignore')
 import pickle
-
+import dill as pickle
 import pandas as pd
 import numpy as np
 import joblib
@@ -37,8 +37,19 @@ def nbsvm_models():
     global pipe 
     global model
     
-    p = PreProcessing()
-    pipe = p.load_pipe()
+    class CustomUnpickler(pickle.Unpickler):
+        def find_class(self, module, name):
+            if name == 'FeatureSelector':
+                from ipynb.fs.full.Model_Preprocessing import FeatureSelector
+                return FeatureSelector
+            elif name == 'Encoding':
+                from ipynb.fs.full.Model_Preprocessing import Encoding
+                return Encoding
+            return super().find_class(module, name)
+
+    filename = 'pipe.pickle'
+    
+    pipe = CustomUnpickler( open(filename, 'rb') ).load()  
     
     model = joblib.load( 'model.joblib' )
      
