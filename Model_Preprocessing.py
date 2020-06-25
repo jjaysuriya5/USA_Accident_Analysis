@@ -159,7 +159,7 @@ class PreProcessing:
         
     def save_pipe(self):
         
-        filename = 'pipe.pickle'
+        self.filename = 'pipe.pickle'
         with open(filename, 'wb') as file:
             pickle.dump(self.preprocessing_pipeline, file)
         
@@ -169,10 +169,10 @@ class PreProcessing:
             
             def find_class(self, module, name):
                 if name == 'FeatureSelector':
-                    from ipynb.fs.full.Model_Preprocessing import FeatureSelector
+                    from Model_Preprocessing import FeatureSelector
                     return FeatureSelector
                 elif name == 'Encoding':
-                    from ipynb.fs.full.Model_Preprocessing import Encoding
+                    from Model_Preprocessing import Encoding
                     return Encoding
                 return super().find_class(module, name)
     
