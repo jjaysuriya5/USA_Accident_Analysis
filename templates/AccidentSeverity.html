@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	{% block title %}Prediction Page{% endblock %}
+
+	
+</head>
+<body>
+
+	<div class="sidenav">
+	</div>
+	<div id="content" name="content" class = "main">
+		{% block content %}
+		<h2>ACCIDENT SEVERITY PREDICTION PAGE</h2>
+		<br>
+		<br>
+		<h4> Predicted Severity  -  {{ severity_prediction }} </h4>
+		
+		<br><br><br>
+		<h3> Accident details : </h4>
+		<ul style="list-style-type:disc">
+			{% for name , data in display_info %}
+				<li> {{name}}    -   {{data}}  </li>
+			{% endfor %}
+			
+		</ul>
+		<br>
+		<br>
+	
+
+		{% endblock %}
+	</div>
+</body>
