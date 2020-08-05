@@ -15,7 +15,7 @@ TMC = [241, 201, 245, 247, 206, 203, 343, 202, 229, 222, 246, 406, 248, 236, 239
 
 from flask import Flask , render_template , url_for , request
 from sklearn.base import  TransformerMixin 
-from Model_Preprocessing import  PreProcessing
+from ipynb.fs.full.Model_Preprocessing import  PreProcessing
 # from keras.models import model_from_json 
 import warnings
 warnings.filterwarnings('ignore')
@@ -35,8 +35,12 @@ app = Flask(__name__)
 @app.before_first_request
 def nbsvm_models():
 
-    global pipe 
+#     global pipe 
     global model
+    
+    filename = 'pipe.pickle'
+#     model = joblib.load( filename  )
+
     
     class CustomUnpickler(pickle.Unpickler):
         def find_class(self, module, name):
@@ -46,16 +50,13 @@ def nbsvm_models():
             elif name == 'Encoding':
                 from Model_Preprocessing import Encoding
                 return Encoding
-            elif name == 'CustomeScaler':
-                from Model_Preprocessing import CustomeScaler
-                return CustomeScaler
             return super().find_class(module, name)
 
-    filename = 'pipe.pickle'
     
-    pipe = CustomUnpickler( open(filename, 'rb') ).load()  
     
-    model = joblib.load( 'model.joblib' )
+    model = CustomUnpickler( open(filename, 'rb') ).load()  
+    
+    
      
 @app.route('/')
 def home_page():
@@ -108,7 +109,7 @@ def predict():
 
         data = pd.DataFrame( user_data , columns = columns)
         
-        data = pipe.transform( data )
+#         data = pipe.transform( data )
 
         pt = int( request.form['PredictType'] )
         
@@ -129,8 +130,8 @@ def predict():
         display_info = []
         for i in [ 'Start_Lat', 'Start_Lng' , 'Street', 'City', 'County' , 'State' , 'Year', 'Month', 'Day', 'Hour' ]:
             display_info.append(  ( i , user_input.get( i  ) ) )
-    
 
+            
         return render_template( 'AccidentSeverity.html' , severity_prediction = severity_prediction , display_info = display_info )       
         
 
